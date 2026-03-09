@@ -3,37 +3,43 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const agentsPath = path.join(__dirname, '../../../AGENTS.md'); // Ruta al AGENTS.md raíz
+// Subimos 3 niveles desde src/agents/ para llegar a la raíz donde está AGENTS.md
+const agentsPath = path.join(__dirname, '../../AGENTS.md');
 
-const skillName = process.argv[2] || 'nuevaSkill';
+const skillName = process.argv[2];
 const description = process.argv[3] || 'Sin descripción';
 
+if (!skillName) {
+    console.error("❌ Error: Debes proporcionar un nombre para la skill.");
+    process.exit(1);
+}
+
 const createSkill = () => {
-    // 1. Definir rutas
     const skillPath = path.join(__dirname, `${skillName}Skill.js`);
     const mdPath = path.join(__dirname, `../../.agent/skills/${skillName}.md`);
 
-    // 2. Contenido de los archivos
-    const jsContent = `export const run = () => console.log("Skill ${skillName} activa");`;
-    const mdContent = `# Skill: ${skillName}\n\n${description}`;
+    const jsContent = `export const run = async (payload) => {\n    console.log("Skill ${skillName} activa");\n    return { success: true };\n};`;
+    const mdContent = `# Skill: ${skillName}\n\n${description}\n\n## Uso\n1. Invocar desde AGENTS.md`;
 
-    // 3. La nueva regla para AGENTS.md
-    const nuevaRegla = `\n- **SI** el usuario pide "${skillName}":\n  -> DELEGAR A: \`${skillName}Skill.js\`\n  -> REGLAS DE USO: [.agent/workflows/verify-skills.md](.agent/workflows/verify-skills.md)`;
+    // Regla estandarizada para el registro
+    const nuevaRegla = `\n- **SI** el usuario pide "${skillName}":\n  -> DELEGAR A: \`${skillName}Skill.js\`\n  -> REGLAS DE USO: [.agent/skills/${skillName}.md](.agent/skills/${skillName}.md)`;
 
     try {
-        // Escribir los archivos base
+        // Generación de archivos físicos
         fs.writeFileSync(skillPath, jsContent);
         fs.writeFileSync(mdPath, mdContent);
 
-        // 4. AUTO-REGISTRO: Inyectar la regla en AGENTS.md
+        // Inyección de la regla en el cerebro del sistema
         if (fs.existsSync(agentsPath)) {
             fs.appendFileSync(agentsPath, nuevaRegla);
             console.log(`>>> REGISTRO: AGENTS.md actualizado con la skill ${skillName}.`);
+        } else {
+            console.warn(`⚠️ Advertencia: No se encontró AGENTS.md en ${agentsPath}`);
         }
 
         console.log(`>>> FACTORY: Skill [${skillName}] creada exitosamente.`);
     } catch (error) {
-        console.error("Error en la fábrica:", error.message);
+        console.error("❌ Error en la fábrica:", error.message);
     }
 };
 
