@@ -3,44 +3,53 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// Subimos 3 niveles desde src/agents/ para llegar a la raíz donde está AGENTS.md
 const agentsPath = path.join(__dirname, '../../AGENTS.md');
 
 const skillName = process.argv[2];
 const description = process.argv[3] || 'Sin descripción';
 
-if (!skillName) {
-    console.error("❌ Error: Debes proporcionar un nombre para la skill.");
-    process.exit(1);
-}
-
 const createSkill = () => {
-    const skillPath = path.join(__dirname, `${skillName}Skill.js`);
-    const mdPath = path.join(__dirname, `../../.agent/skills/${skillName}.md`);
+    const paths = {
+        js: path.join(__dirname, `${skillName}Skill.js`),
+        md: path.join(__dirname, `../../.agent/skills/${skillName}.md`),
+        test: path.join(__dirname, `test-${skillName}.js`)
+    };
 
-    const jsContent = `export const run = async (payload) => {\n    console.log("Skill ${skillName} activa");\n    return { success: true };\n};`;
-    const mdContent = `# Skill: ${skillName}\n\n${description}\n\n## Uso\n1. Invocar desde AGENTS.md`;
+    // ESTÁNDAR DE DOCUMENTACIÓN (Lógica de aplicación)
+    const mdContent = `
+# Skill: ${skillName}
+> ${description}
 
-    // Regla estandarizada para el registro
-    const nuevaRegla = `\n- **SI** el usuario pide "${skillName}":\n  -> DELEGAR A: \`${skillName}Skill.js\`\n  -> REGLAS DE USO: [.agent/skills/${skillName}.md](.agent/skills/${skillName}.md)`;
+## 🧠 Cuándo aplicar (Trigger)
+- Cuando el usuario solicite explícitamente: "${skillName}"
+- Ante la necesidad de: ${description}
+
+## ⚙️ Cómo aplicar (Payload)
+El Orquestador debe enviar:
+\`\`\`json
+{ "action": "execute", "params": {} }
+\`\`\`
+`.trim();
+
+    // SCRIPT DE PRUEBA INSTANTÁNEA
+    const testContent = `
+import { run } from './${skillName}Skill.js';
+console.time('Test-${skillName}');
+run({ test: true }).then(res => {
+    console.log("Resultado:", res);
+    console.timeEnd('Test-${skillName}');
+});`.trim();
 
     try {
-        // Generación de archivos físicos
-        fs.writeFileSync(skillPath, jsContent);
-        fs.writeFileSync(mdPath, mdContent);
+        fs.writeFileSync(paths.js, `export const run = async (p) => ({ success: true, data: p });`);
+        fs.writeFileSync(paths.md, mdContent);
+        fs.writeFileSync(paths.test, testContent);
 
-        // Inyección de la regla en el cerebro del sistema
-        if (fs.existsSync(agentsPath)) {
-            fs.appendFileSync(agentsPath, nuevaRegla);
-            console.log(`>>> REGISTRO: AGENTS.md actualizado con la skill ${skillName}.`);
-        } else {
-            console.warn(`⚠️ Advertencia: No se encontró AGENTS.md en ${agentsPath}`);
-        }
+        // Auto-registro en AGENTS.md
+        const regla = `\n- **SI** pide "${skillName}": -> DELEGAR A: \`${skillName}Skill.js\` -> VER: [.agent/skills/${skillName}.md]`;
+        fs.appendFileSync(agentsPath, regla);
 
-        console.log(`>>> FACTORY: Skill [${skillName}] creada exitosamente.`);
-    } catch (error) {
-        console.error("❌ Error en la fábrica:", error.message);
-    }
+        console.log(`✅ Skill [${skillName}] creada, registrada y con test listo.`);
+    } catch (e) { console.error("Error:", e.message); }
 };
-
 createSkill();

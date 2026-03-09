@@ -4,3 +4,4 @@
 - **SI** el usuario pide "LectorLogs":
   -> DELEGAR A: `LectorLogsSkill.js`
   -> REGLAS DE USO: [.agent/workflows/verify-skills.md](.agent/workflows/verify-skills.md)
+- **SI** pide "BuscadorTodos": -> DELEGAR A: `BuscadorTodosSkill.js` -> VER: [.agent/skills/BuscadorTodos.md]
