@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const agentsPath = path.join(__dirname, '../../AGENTS.md'); // Ruta al AGENTS.md raíz
+const agentsPath = path.join(__dirname, '../../../AGENTS.md'); // Ruta al AGENTS.md raíz
 
 const skillName = process.argv[2] || 'nuevaSkill';
 const description = process.argv[3] || 'Sin descripción';
