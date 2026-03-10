@@ -25,43 +25,57 @@ export const run = async (p = {}) => {
         const { stdout: diffUnified } = await execAsync('git diff --cached --unified=0');
         const lineasAgregadas = diffUnified.split('\n').filter(line => line.startsWith('+') && !line.startsWith('+++'));
 
-        // Heurística de Descripción
-        let descripcionAccion = "";
-        let tipo = "update";
+        // Mapeos explícitos
+        const acciones = [];
 
-        // Prioridad 1: console.log
-        if (lineasAgregadas.some(line => line.includes('console.log'))) {
-            descripcionAccion = "Añade logs de depuración";
-            tipo = "chore";
-        }
-        // Prioridad 2: export const (nueva función)
-        else if (lineasAgregadas.some(line => line.includes('export const'))) {
-            const match = lineasAgregadas.find(line => line.includes('export const')).match(/export const\s+(\w+)/);
-            const funcName = match ? match[1] : 'indefinida';
-            descripcionAccion = `Añade funcionalidad ${funcName}`;
-            tipo = "feat";
-        }
-        // Prioridad 3: Cambios en .md
-        else if (archivos.some(a => a.endsWith('.md'))) {
-            const mdFiles = archivos.filter(a => a.endsWith('.md')).map(a => a.split('/').pop());
-            const filesStr = mdFiles.length > 1 ? "varios archivos" : mdFiles[0];
-            descripcionAccion = `Actualiza documentación de ${filesStr}`;
-            tipo = "docs";
-        }
-        // Fallback: Prohibición de Genéricos
-        else {
-            throw new Error("No se pudo determinar el cambio: el contenido no coincide con las heurísticas conocidas (logs, nueva función, o documentación).");
+        archivos.forEach(archivo => {
+            const nombreArchivo = archivo.split('/').pop();
+            const esMarkdown = archivo.endsWith('.md');
+
+            // Buscar porciones del diff para este archivo en específico es complejo con unified=0
+            // Aplicaremos una heurística simplificada sobre todas las líneas agregadas, 
+            // pero para ser hiper-precisos habría que parsear el diff por archivo.
+            // Adoptaremos un enfoque global de las líneas agregadas por ahora,
+            // vinculando al archivo si la línea pertenece a una función o markdown conocido
+
+            if (esMarkdown) {
+                const headers = lineasAgregadas.filter(l => l.match(/^\+\s*#{1,6}\s+(.*)/));
+                if (headers.length > 0) {
+                    headers.forEach(h => {
+                        const match = h.match(/^\+\s*(#{1,6}\s+.*)/);
+                        if (match) {
+                            acciones.push(`Agrega sección ${match[1].trim()} en ${nombreArchivo}`);
+                        }
+                    });
+                } else if (lineasAgregadas.length > 0) {
+                    acciones.push(`Edita contenido en ${nombreArchivo}`);
+                }
+            } else {
+                // Código JS / TS
+                const functions = lineasAgregadas.filter(l => l.match(/^\+\s*(export const|function|class)\s+(\w+)/));
+                if (functions.length > 0) {
+                    functions.forEach(f => {
+                        const match = f.match(/^\+\s*(?:export const|function|class)\s+(\w+)/);
+                        if (match) {
+                            const tipo = f.includes('class') ? 'clase' : 'función';
+                            acciones.push(`Añade ${tipo} ${match[1]}() en ${nombreArchivo}`);
+                        }
+                    });
+                } else if (lineasAgregadas.some(l => l.includes('console.log'))) {
+                    acciones.push(`Añade logs en ${nombreArchivo}`);
+                } else if (lineasAgregadas.length > 0) {
+                    acciones.push(`Modifica lógica en ${nombreArchivo}`);
+                }
+            }
+        });
+
+        if (acciones.length === 0) {
+            throw new Error("No se pudo extraer una acción específica (función, clase, sección md).");
         }
 
-        // 4. Formato de Salida
-        const archivosNombres = archivos.map(f => f.split('/').pop());
-        const maxFiles = 3;
-        let listaNombres = archivosNombres.slice(0, maxFiles).join(', ');
-        if (archivosNombres.length > maxFiles) {
-            listaNombres += ` y ${archivosNombres.length - maxFiles} más`;
-        }
-
-        let mensajeGenerado = `${tipo}: ${descripcionAccion} en [${listaNombres}]`;
+        // Deduplicar y formatear
+        const accionesUnicas = [...new Set(acciones)];
+        const mensajeGenerado = accionesUnicas.join('; ');
 
         console.log("Mensaje de commit generado:");
         console.log(mensajeGenerado);

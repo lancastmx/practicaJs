@@ -6,4 +6,4 @@
   -> REGLAS DE USO: [.agent/workflows/verify-skills.md](.agent/workflows/verify-skills.md)
 - **SI** pide "BuscadorTodos": -> DELEGAR A: `BuscadorTodosSkill.js` -> REGLAS DE USO: [.agent/workflows/verify-skills.md] -> VER: (.agent/skills/BuscadorTodos.md)
 - **SI** pide "RegistradorCommit": -> DELEGAR A: `RegistradorCommitSkill.js` -> REGLAS DE USO: [.agent/workflows/verify-skills.md] -> VER: (.agent/skills/RegistradorCommit.md)
-- **SI** pide "Commit": -> DELEGAR A: `AutoCommitSkill.js` -> REGLAS DE USO: [.agent/workflows/verify-skills.md](.agent/workflows/verify-skills.md)
+- **SI** pide "AutoCommit": -> DELEGAR A: `AutoCommitSkill.js` -> REGLAS DE USO: [.agent/workflows/verify-skills.md](.agent/workflows/verify-skills.md)
