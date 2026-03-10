@@ -18,7 +18,9 @@ Dependencias: Llama a src/agents/RegistradorCommitSkill.js para persistir datos 
 ## ⚙️ Cómo aplicar (Payload)
 El Orquestador debe enviar:
 ```json
-{ "action": "execute", "params": {} }
+{
+  "action": "execute",
+  "entryPoint": "src/agents/AutoCommitSkill.js",
+  "params": {}
+}
 ```
-
-> **⚠️ OBLIGATORIO:** No invoques `test-AutoCommit.js`. Este skill debe ser llamado directamente importando e invocando la función `run()` desde `src/agents/AutoCommitSkill.js`.

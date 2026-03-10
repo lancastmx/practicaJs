@@ -72,7 +72,11 @@ Dependencias: \n${depListString}
 ## ⚙️ Cómo aplicar (Payload)
 El Orquestador debe enviar:
 \`\`\`json
-{ "action": "execute", "params": {} }
+{
+  "action": "execute",
+  "entryPoint": "src/agents/${skillName}Skill.js",
+  "params": {}
+}
 \`\`\`
 `.trim();
 
