@@ -46,7 +46,7 @@ run({ test: true }).then(res => {
         fs.writeFileSync(paths.test, testContent);
 
         // Auto-registro en AGENTS.md
-        const regla = `\n- **SI** pide "${skillName}": -> DELEGAR A: \`${skillName}Skill.js\` -> VER: [.agent/skills/${skillName}.md]`;
+        const regla = `\n- **SI** pide "${skillName}": -> DELEGAR A: \`${skillName}Skill.js\` -> REGLAS DE USO: [.agent/workflows/verify-skills.md](.agent/skills/${skillName}.md)`;
         fs.appendFileSync(agentsPath, regla);
 
         console.log(`✅ Skill [${skillName}] creada, registrada y con test listo.`);
