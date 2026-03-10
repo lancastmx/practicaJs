@@ -5,3 +5,4 @@
   -> DELEGAR A: `LectorLogsSkill.js`
   -> REGLAS DE USO: [.agent/workflows/verify-skills.md](.agent/workflows/verify-skills.md)
 - **SI** pide "BuscadorTodos": -> DELEGAR A: `BuscadorTodosSkill.js` -> VER: [.agent/skills/BuscadorTodos.md]
+- **SI** pide "RegistradorCommit": -> DELEGAR A: `RegistradorCommitSkill.js` -> VER: [.agent/skills/RegistradorCommit.md]
