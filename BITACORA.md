@@ -1,5 +1,21 @@
 # 📓 BITÁCORA DE INGENIERÍA
 
+## 🛠️ [ID: b1fe7f8] | 9/3/2026, 10:53:44 p.m.
+- **Autor:** lancast <angelprep92@gmail.com>
+- **Cambios Técnicos:**
+  - Añade función: run()
+  - Añade función: currentBranch()
+  - Añade función: autoCommitResult()
+  - Añade función: lastCommitMsg()
+  - Añade función: safeMessage()
+  - Añade sección: Skill: CerrarPBI
+  - Añade sección: 📂 Archivos y Activos
+  - Añade sección: 🧠 Cuándo aplicar (Trigger)
+  - Añade sección: ⚙️ Cómo aplicar (Payload)
+  - Añade sección: 📋 Flujo Técnico
+- **Archivos:** .agent/skills/CerrarPBI.md, AGENTS.md, src/agents/CerrarPBISkill.js, src/agents/test-CerrarPBI.js
+
+---
 ## 🛠️ [ID: 496a959] | 9/3/2026, 10:25:08 p.m.
 - **Autor:** lancast <angelprep92@gmail.com>
 - **Cambios Técnicos:**
