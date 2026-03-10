@@ -1,116 +1,56 @@
-// v1.1 - Soporte para mensajes en lenguaje natural.
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import { run as runRegistrador } from './RegistradorCommitSkill.js';
+import { execSync } from 'child_process';
+import { run as registrarEnBitacora } from './RegistradorCommitSkill.js';
 
-const execAsync = promisify(exec);
-
-export const run = async (p = {}) => {
+export const run = async (payload = {}) => {
     try {
-        console.log("Iniciando AutoCommitSkill...");
+        // 1. Obtener archivos en staging (excluyendo bitácora)
+        const stagingFiles = execSync('git diff --cached --name-only', { encoding: 'utf-8' })
+            .split('\n').filter(f => f && f !== 'BITACORA.md');
 
-        // 1. Añadir cambios
-        console.log("Ejecutando `git add .`...");
-        await execAsync('git add .');
-
-        // 2. Obtener estado ignorando BITACORA.md
-        const { stdout: diffOut } = await execAsync('git diff --cached --name-only');
-        const archivos = diffOut.trim().split('\n').filter(Boolean).filter(a => a !== 'BITACORA.md');
-
-        if (archivos.length === 0) {
-            throw new Error("No se puede hacer commit: no hay archivos relevantes en el área de staging (excluyendo BITACORA.md).");
+        if (stagingFiles.length === 0) {
+            return { success: false, error: "No hay cambios preparados para commit." };
         }
 
-        // 3. Análisis Real de Contenido
-        let lineasAgregadas = [];
-        if (archivos.length > 0) {
-            const { stdout: diffFiles } = await execAsync(`git diff --cached --unified=0 -- ${archivos.join(' ')}`);
-            lineasAgregadas = diffFiles.split('\n').filter(line => line.startsWith('+') && !line.startsWith('+++'));
-        }
+        // 2. Análisis técnico del Diff
+        const diff = execSync(`git diff --cached --unified=0 -- ${stagingFiles.join(' ')}`, { encoding: 'utf-8' });
+        const lineas = diff.split('\n').filter(l => l.startsWith('+') && !l.startsWith('+++'));
 
-        // Mapeos explícitos
-        const acciones = [];
-
-        archivos.forEach(archivo => {
-            const nombreArchivo = archivo.split('/').pop();
-            const esMarkdown = archivo.endsWith('.md');
-
-            // Buscar porciones del diff para este archivo en específico es complejo con unified=0
-            // Aplicaremos una heurística simplificada sobre todas las líneas agregadas, 
-            // pero para ser hiper-precisos habría que parsear el diff por archivo.
-            // Adoptaremos un enfoque global de las líneas agregadas por ahora,
-            // vinculando al archivo si la línea pertenece a una función o markdown conocido
-
-            if (esMarkdown) {
-                const headers = lineasAgregadas.filter(l => l.match(/^\+\s*#{1,6}\s+(.*)/));
-                if (headers.length > 0) {
-                    headers.forEach(h => {
-                        const match = h.match(/^\+\s*(#{1,6}\s+.*)/);
-                        if (match) {
-                            acciones.push(`Agrega sección ${match[1].trim()} en ${nombreArchivo}`);
-                        }
-                    });
-                } else if (lineasAgregadas.length > 0) {
-                    acciones.push(`Edita contenido en ${nombreArchivo}`);
-                }
-            } else {
-                // Código JS / TS
-                const functions = lineasAgregadas.filter(l => l.match(/^\+\s*(export const|function|class)\s+(\w+)/));
-                if (functions.length > 0) {
-                    functions.forEach(f => {
-                        const match = f.match(/^\+\s*(?:export const|function|class)\s+(\w+)/);
-                        if (match) {
-                            const tipo = f.includes('class') ? 'clase' : 'función';
-                            acciones.push(`Añade ${tipo} ${match[1]}() en ${nombreArchivo}`);
-                        }
-                    });
-                } else if (lineasAgregadas.some(l => l.includes('console.log'))) {
-                    acciones.push(`Añade logs en ${nombreArchivo}`);
-                } else if (lineasAgregadas.length > 0) {
-                    acciones.push(`Modifica lógica en ${nombreArchivo}`);
-                }
+        // Heurística de explicación
+        const cambios = stagingFiles.map(file => {
+            const ext = file.split('.').pop();
+            const base = `Archivo: ${file}`;
+            if (ext === 'js' || ext === 'ts') {
+                const funcs = lineas.filter(l => l.match(/(function|const|class)\s+(\w+)/)).map(l => l.match(/(?:const|function|class)\s+(\w+)/)[1]);
+                return `${base} -> ${funcs.length > 0 ? `Añade/Modifica: ${funcs.join(', ')}` : 'Cambios de lógica interna'}`;
             }
+            if (ext === 'md') {
+                const headers = lineas.filter(l => l.startsWith('+##')).map(l => l.replace(/^\+##\s+/, '').trim());
+                return `${base} -> Actualiza secciones: ${headers.join(', ') || 'Contenido general'}`;
+            }
+            return `${base} -> Actualización de datos`;
         });
 
-        if (acciones.length === 0) {
-            throw new Error("No se pudo extraer una acción específica (función, clase, sección md).");
-        }
+        const explicacionNarrativa = cambios.join('\n- ');
+        const mensajeCommit = `feat: ${stagingFiles.slice(0, 2).join(', ')}${stagingFiles.length > 2 ? ' y otros' : ''}`;
 
-        // Deduplicar y formatear
-        const accionesUnicas = [...new Set(acciones)];
-        const mensajeGenerado = accionesUnicas.join('; ');
+        // 3. Ejecutar Commit
+        execSync(`git commit -m "${mensajeCommit}"`);
 
-        console.log("Mensaje de commit generado:");
-        console.log(mensajeGenerado);
+        // 4. Obtener Meta-datos finales
+        const commitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
+        const autor = execSync('git log -1 --format="%an <%ae>"', { encoding: 'utf-8' }).trim();
 
-        // 4. Registro: Invocar a RegistradorCommitSkill ANTES del commit real
-        if (p.forceRewrite) {
-            console.log("Ejecutando limpieza profunda de bitácora (forceRewrite)...");
-            await runRegistrador({ forceRewrite: true });
-        }
+        // 5. Registrar en Bitácora con el nuevo formato
+        await registrarEnBitacora({
+            hash: commitHash,
+            autor: autor,
+            mensaje: mensajeCommit,
+            explicacion: explicacionNarrativa,
+            archivos: stagingFiles
+        });
 
-        console.log("Añadiendo el mensaje a BITACORA.md...");
-        const registroResultado = await runRegistrador({ mensajeGenerado });
-
-        // 5. Commit Total
-        console.log("Ejecutando `git add .` final y `git commit`...");
-        await execAsync('git add .'); // Asegurarnos de añadir los cambios de BITACORA.md
-
-        const mensajeFinal = `${mensajeGenerado}; actualiza BITACORA.md`;
-        const mensajeSeguro = mensajeFinal.replace(/"/g, '\\"');
-        await execAsync(`git commit -m "${mensajeSeguro}"`);
-
-        console.log("Commit finalizado con éxito.");
-
-        return {
-            success: true,
-            data: {
-                mensajeGenerado: mensajeFinal,
-                registro: registroResultado
-            }
-        };
+        return { success: true, data: { hash: commitHash, mensaje: mensajeCommit } };
     } catch (error) {
-        console.error("Error en AutoCommitSkill:", error);
         return { success: false, error: error.message };
     }
 };
