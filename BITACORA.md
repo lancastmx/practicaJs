@@ -1,5 +1,7 @@
 # Bitácora de Commits
 
+## [2026-03-09 19:09:44] | Autor: lancast <angelprep92@gmail.com> | Mensaje: chore: Añade logs de depuración en [BITACORA.md, AutoCommitSkill.js]
+
 ## [2026-03-09 19:06:19] | Autor: lancast <angelprep92@gmail.com> | Mensaje: fix: [BITACORA.md, AutoCommitSkill.js, test-AutoCommit.js] y cambios relacionados
 
 ## [2026-03-09 19:02:09] | Autor: lancast <angelprep92@gmail.com> | Mensaje: chore: actualización automática
