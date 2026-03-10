@@ -11,3 +11,4 @@
 - **SI** pide "AutoCommit": -> DELEGAR A: `AutoCommitSkill.js` -> REGLAS DE USO: [.agent/skills/AutoCommit.md](.agent/skills/AutoCommit.md)
 - **SI** pide "doc-expert": -> DELEGAR A: `doc-expertSkill.js` -> REGLAS DE USO: [.agent/skills/doc-expert.md](.agent/skills/doc-expert.md)
 - **SI** pide "GestionPBI": -> DELEGAR A: `GestionPBISkill.js` -> REGLAS DE USO: [.agent/skills/GestionPBI.md](.agent/skills/GestionPBI.md)
+- **SI** pide "CerrarPBI": -> DELEGAR A: `CerrarPBISkill.js` -> REGLAS DE USO: [.agent/skills/CerrarPBI.md](.agent/skills/CerrarPBI.md)

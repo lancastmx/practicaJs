@@ -9,10 +9,10 @@ export const run = async (payload = {}) => {
         const descripcion = payload.descripcion || 'Descripción inicial del PBI.';
         const ramaPBI = `pbi-${nombre}`;
 
-        // 1. git checkout main y git pull
+        // 1. git checkout main y git pull origin main
         execSync('git checkout main', { stdio: 'ignore' });
         try {
-            execSync('git pull', { stdio: 'ignore' });
+            execSync('git pull origin main', { stdio: 'ignore' });
         } catch (e) {
             // Ignorar errores menores de red si origin no está accesible o no hay cambios
         }
