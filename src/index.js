@@ -1,37 +1,54 @@
-import readline from 'readline';
-import { exec } from 'child_process';
-import path from 'path';
+import readline from 'readline/promises'; // Versión moderna para usar await
+import { stdin as input, stdout as output } from 'process';
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+const rl = readline.createInterface({ input, output });
 
-// Mapa de lecciones: aquí irás registrando tus avances
 const lecciones = {
-    "01": "./01-vars.js",
-    "07": "./07.logig.js",
-    "08": "./08-if-else.js",
+    "01": "./lecciones/01-vars.js",
+    "07": "./lecciones/07-log.js",
+    "08": "./lecciones/08-if-else.js",
+    "09": "./lecciones/09-switch.js",
+    "salir": null
 };
 
-console.log("--- 🎓 LABORATORIO DE JAVASCRIPT ---");
-console.log("Selecciona una lección para ejecutar:");
-Object.keys(lecciones).forEach(key => console.log(`${key}: ${lecciones[key]}`));
+async function iniciarLaboratorio() {
+    let continuar = true;
 
-rl.question("\nDigita el número (ej: 01): ", async (respuesta) => {
-    const archivo = lecciones[respuesta];
+    while (continuar) {
+        console.clear(); // Limpia la consola para que se vea ordenado
+        console.log("--- 🎓 ACADEMIA JS: MENÚ PRINCIPAL ---");
+        Object.keys(lecciones).forEach(key => console.log(`[${key}] - ${lecciones[key] || 'Cerrar programa'}`));
 
-    if (archivo) {
-        console.log(`\n🚀 Ejecutando: ${archivo}\n------------------`);
-        try {
-            // Importamos dinámicamente el archivo elegido
-            await import(archivo);
-        } catch (err) {
-            console.error("❌ Error al ejecutar la lección:", err.message);
+        const seleccion = await rl.question("\n¿Qué lección quieres estudiar? (o escribe 'salir'): ");
+
+        if (seleccion.toLowerCase() === 'salir') {
+            continuar = false;
+            console.log("¡Sigue practicando! Hasta pronto.");
+            break;
         }
-    } else {
-        console.log("⚠️ Opción no válida.");
-    }
 
+        const archivo = lecciones[seleccion];
+
+        if (archivo) {
+            let repetirLeccion = true;
+            while (repetirLeccion) {
+                console.log(`\n📖 Iniciando: ${archivo}\n------------------`);
+
+                // Limpiamos el cache para que si cambias el código, se vea el cambio
+                const timestamp = Date.now();
+                await import(`${archivo}?update=${timestamp}`);
+
+                const respuesta = await rl.question("\n¿Quieres repetir esta lección? (s/n): ");
+                if (respuesta.toLowerCase() !== 's') {
+                    repetirLeccion = false;
+                }
+            }
+        } else {
+            console.log("⚠️ Opción no válida. Intenta de nuevo.");
+            await rl.question("\nPresiona Enter para continuar...");
+        }
+    }
     rl.close();
-});
+}
+
+iniciarLaboratorio();
