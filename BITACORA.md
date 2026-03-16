@@ -1,5 +1,25 @@
 # 📓 BITÁCORA DE INGENIERÍA
 
+## 🛠️ [ID: 43bd533] | 16/3/2026, 11:52:12 a.m.
+- **Autor:** lancast
+- **Cambios Técnicos:**
+  - AutoCommitSkill: ahora solo hace git add + git diff --cached y retorna el diff como string
+  - NarrativaCommitSkill: convertida en stub deprecado
+  - AutoCommit.md: flujo completo actualizado (diff -> narrativa -> commit -> BITACORA -> amend)
+  - NarrativaCommit.md: marcada como deprecada
+- **Archivos:** .agent/skills/AutoCommit.md, .agent/skills/NarrativaCommit.md, agents/AutoCommitSkill.js, agents/NarrativaCommitSkill.js
+
+---
+## 🛠️ [ID: 13eae55] | 16/3/2026, 11:30:59 a.m.
+- **Autor:** lancast
+- **Cambios Técnicos:**
+  - Añade NarrativaCommitSkill.run()
+- Refactoriza AutoCommitSkill.run()
+  - Añade NarrativaCommit.md
+- Actualiza AutoCommit.md
+- **Archivos:** agents/AutoCommitSkill.js, agents/NarrativaCommitSkill.js, .agent/skills/AutoCommit.md, .agent/skills/NarrativaCommit.md, AGENTS.md, src/index.js, src/lecciones/10-for-while.js
+
+---
 ## 🛠️ [ID: a3949ab] | 16/3/2026, 10:59:47 a.m.
 - **Autor:** lancast <angelprep92@gmail.com>
 - **Cambios Técnicos:**

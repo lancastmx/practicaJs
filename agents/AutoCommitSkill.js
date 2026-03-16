@@ -1,14 +1,19 @@
 import { execSync } from 'child_process';
-import { run as generarNarrativa } from './NarrativaCommitSkill.js';
 
 const EXCLUDE = ['BITACORA.md'];
 
+/**
+ * Skill: AutoCommit
+ *
+ * Hace git add ., captura el diff staged y lo retorna como string
+ * para que el agente del IDE genere la narrativa del commit.
+ */
 export const run = async (payload = {}) => {
     try {
         // 1. Preparar staging
         execSync('git add .', { stdio: 'ignore' });
 
-        // 2. Verificar que hay cambios staged (excluyendo bitácora)
+        // 2. Verificar que hay archivos staged (excluyendo bitácora)
         const stagingFiles = execSync('git diff --cached --name-only', { encoding: 'utf-8' })
             .split('\n')
             .filter(f => f && !EXCLUDE.includes(f));
@@ -18,12 +23,12 @@ export const run = async (payload = {}) => {
         }
 
         // 3. Obtener el diff completo de staging
-        const diffCompleto = execSync('git diff --cached', { encoding: 'utf-8' });
+        const diff = execSync('git diff --cached', { encoding: 'utf-8' });
 
-        // 4. Delegar la creación del prompt a NarrativaCommitSkill
-        const resultado = await generarNarrativa(diffCompleto);
+        console.log('\n✅ Diff capturado. El agente generará el mensaje de commit.\n');
+        console.log('📂 Archivos en staging:', stagingFiles.join(', '));
 
-        return { success: resultado.success, data: resultado };
+        return { success: true, diff, stagingFiles };
     } catch (error) {
         return { success: false, error: error.message };
     }
