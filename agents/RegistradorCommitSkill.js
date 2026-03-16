@@ -6,20 +6,16 @@ export const run = async (data = {}) => {
     const bitacoraPath = path.join(process.cwd(), 'BITACORA.md');
     const tituloPrincipal = "# 📓 BITÁCORA DE INGENIERÍA\n\n";
 
-    // Si es una reconstrucción (forceRewrite)
+    // ── Modo reconstrucción total ──────────────────────────────────────────
     if (data.forceRewrite) {
         let nuevoContenido = tituloPrincipal;
-
         try {
-            // Obtener el historial de git y parsearlo a nuestro formato
             const logOut = execSync('git log --pretty=format:"%h|%an <%ae>|%ad|%s" --date=iso', { encoding: 'utf-8' });
             if (logOut) {
-                const commits = logOut.split('\n');
-                for (const commitLine of commits) {
+                for (const commitLine of logOut.split('\n')) {
                     const partes = commitLine.split('|');
                     if (partes.length < 4) continue;
                     const [hash, autor, fechaStr, mensaje] = partes;
-
                     const fecha = new Date(fechaStr).toLocaleString();
                     let archivos = [];
                     try {
@@ -27,15 +23,7 @@ export const run = async (data = {}) => {
                         archivos = filesOut.split('\n').filter(Boolean);
                     } catch (e) { }
 
-                    const bloque = `## 🛠️ [ID: ${hash}] | ${fecha}
-- **Autor:** ${autor}
-- **Cambios Técnicos:**
-  - ${mensaje}
-- **Archivos:** ${archivos.join(', ') || 'Ninguno'}
-
----
-`;
-                    nuevoContenido += bloque;
+                    nuevoContenido += _bloque(hash, autor, fecha, mensaje, archivos);
                 }
             }
             fs.writeFileSync(bitacoraPath, nuevoContenido);
@@ -45,41 +33,66 @@ export const run = async (data = {}) => {
         }
     }
 
-    // Modo inserción atómica (antes de commitear)
-    const fecha = new Date().toLocaleString();
-    const hash = data.hash || 'PENDIENTE'; // Al ir antes del commit, el ID real no existe todavía
-    const autor = data.autor || 'Desconocido';
-    const listaDeFuncionesDetectadas = data.funciones || '  - Sin nuevas funciones detectadas';
-    const seccionesMarkdownNuevas = data.seccionesMd || '  - Sin nuevas secciones Markdown';
-    const listaArchivos = (data.archivos && data.archivos.length) ? data.archivos.join(', ') : 'Ninguno';
+    // ── Modo inserción atómica ─────────────────────────────────────────────
+    try {
+        const hash   = data.hash   || execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
+        const autor  = data.autor  || execSync('git config user.name',        { encoding: 'utf-8' }).trim();
+        const fecha  = new Date().toLocaleString();
 
-    const bloque = `## 🛠️ [ID: ${hash}] | ${fecha}
+        // Captura el mensaje completo del último commit, íntegro, sin alterar
+        const mensajeCompleto = execSync('git log -1 --pretty=%B', { encoding: 'utf-8' }).trim();
+
+        const listaArchivos = (data.archivos && data.archivos.length)
+            ? data.archivos.join(', ')
+            : 'Ninguno';
+
+        const bloque = _bloque(hash, autor, fecha, mensajeCompleto, listaArchivos);
+
+        // Inyectar justo debajo del título principal
+        let contenidoActual = fs.existsSync(bitacoraPath)
+            ? fs.readFileSync(bitacoraPath, 'utf-8')
+            : tituloPrincipal;
+
+        if (!contenidoActual.startsWith("# 📓 BITÁCORA DE INGENIERÍA")) {
+            contenidoActual = contenidoActual.replace(/^# Bitácora de Commits/, "# 📓 BITÁCORA DE INGENIERÍA");
+            if (!contenidoActual.startsWith("# 📓 BITÁCORA DE INGENIERÍA")) {
+                contenidoActual = tituloPrincipal + contenidoActual;
+            }
+        }
+
+        const nuevoContenido = contenidoActual.replace(
+            /# 📓 BITÁCORA DE INGENIERÍA\n*/,
+            tituloPrincipal + bloque
+        );
+
+        fs.writeFileSync(bitacoraPath, nuevoContenido);
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+};
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+/**
+ * Construye el bloque de bitácora con el mensaje de commit íntegro
+ * como blockquote markdown (> ), preservando multilínea y título.
+ */
+function _bloque(hash, autor, fecha, mensajeCompleto, archivos) {
+    // Convierte cada línea del mensaje en una línea de blockquote
+    const blockquote = mensajeCompleto
+        .split('\n')
+        .map(linea => `> ${linea}`)
+        .join('\n');
+
+    const listaArchivos = Array.isArray(archivos) ? archivos.join(', ') : archivos;
+
+    return `## 🛠️ [ID: ${hash}] | ${fecha}
 - **Autor:** ${autor}
 - **Cambios Técnicos:**
-  ${listaDeFuncionesDetectadas}
-  ${seccionesMarkdownNuevas}
+${blockquote}
 - **Archivos:** ${listaArchivos}
 
 ---
 `;
-
-    let contenidoActual = "";
-    if (fs.existsSync(bitacoraPath)) {
-        contenidoActual = fs.readFileSync(bitacoraPath, 'utf-8');
-    }
-
-    if (!contenidoActual.startsWith("# 📓 BITÁCORA DE INGENIERÍA")) {
-        // Reemplazar si empieza con "# Bitácora de Commits"
-        contenidoActual = contenidoActual.replace(/^# Bitácora de Commits/, "# 📓 BITÁCORA DE INGENIERÍA");
-        if (!contenidoActual.startsWith("# 📓 BITÁCORA DE INGENIERÍA")) {
-            contenidoActual = tituloPrincipal + contenidoActual;
-        }
-    }
-
-    // Reemplazamos el título principal para inyectar nuestra cabecera justo debajo
-    // Usamos el título principal más el bloque
-    let nuevoContenido = contenidoActual.replace(/# 📓 BITÁCORA DE INGENIERÍA\n*/, tituloPrincipal + bloque);
-
-    fs.writeFileSync(bitacoraPath, nuevoContenido);
-    return { success: true };
-};
+}

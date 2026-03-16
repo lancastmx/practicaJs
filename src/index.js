@@ -8,6 +8,7 @@ const lecciones = {
     "07": "./lecciones/07-log.js",
     "08": "./lecciones/08-if-else.js",
     "09": "./lecciones/09-switch.js",
+    "10": "./lecciones/10-for-while.js",
     "salir": null
 };
 

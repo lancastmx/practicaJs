@@ -1,5 +1,62 @@
 # 📓 BITÁCORA DE INGENIERÍA
 
+## 🛠️ [ID: 74dc89b] | 16/3/2026, 11:59:59 a.m.
+- **Autor:** lancast
+- **Cambios Técnicos:**
+> fix(agents): corregir RegistradorCommitSkill para preservar mensaje de commit integro
+> 
+> - Usa git log -1 --pretty=%B para capturar el mensaje completo sin alterar
+> - Formatea cada linea del mensaje como blockquote markdown (> ) en BITACORA.md
+> - Elimina la logica de vinetas forzadas y division por saltos de linea
+> - hash y autor ahora se obtienen de git directamente si no se pasan como parametro
+> - Extrae la logica del bloque a la funcion auxiliar _bloque() para reutilizacion
+- **Archivos:** agents/RegistradorCommitSkill.js, BITACORA.md
+
+---
+## 🛠️ [ID: 2953b5b] | 16/3/2026, 11:57:02 a.m.
+- **Autor:** lancast
+- **Cambios Técnicos:**
+> refactor(agents): simplificar flujo de commit eliminando patron de archivo temp
+> 
+> - AutoCommitSkill ahora solo hace git add + git diff --cached y devuelve el diff como string
+> - NarrativaCommitSkill convertida en stub deprecado; la narrativa la genera el agente del IDE
+> - Actualiza AutoCommit.md con flujo completo: diff -> narrativa -> commit -> BITACORA -> amend
+> - Marca NarrativaCommit.md como deprecada
+- **Archivos:** .agent/skills/AutoCommit.md, agents/AutoCommitSkill.js, agents/NarrativaCommitSkill.js
+
+---
+## 🛠️ [ID: 43bd533] | 16/3/2026, 11:52:12 a.m.
+- **Autor:** lancast
+- **Cambios Técnicos:**
+  - AutoCommitSkill: ahora solo hace git add + git diff --cached y retorna el diff como string
+  - NarrativaCommitSkill: convertida en stub deprecado
+  - AutoCommit.md: flujo completo actualizado (diff -> narrativa -> commit -> BITACORA -> amend)
+  - NarrativaCommit.md: marcada como deprecada
+- **Archivos:** .agent/skills/AutoCommit.md, .agent/skills/NarrativaCommit.md, agents/AutoCommitSkill.js, agents/NarrativaCommitSkill.js
+
+---
+## 🛠️ [ID: 13eae55] | 16/3/2026, 11:30:59 a.m.
+- **Autor:** lancast
+- **Cambios Técnicos:**
+  - Añade NarrativaCommitSkill.run()
+- Refactoriza AutoCommitSkill.run()
+  - Añade NarrativaCommit.md
+- Actualiza AutoCommit.md
+- **Archivos:** agents/AutoCommitSkill.js, agents/NarrativaCommitSkill.js, .agent/skills/AutoCommit.md, .agent/skills/NarrativaCommit.md, AGENTS.md, src/index.js, src/lecciones/10-for-while.js
+
+---
+## 🛠️ [ID: a3949ab] | 16/3/2026, 10:59:47 a.m.
+- **Autor:** lancast <angelprep92@gmail.com>
+- **Cambios Técnicos:**
+  - Sin nuevas funciones detectadas
+  - Añade sección: PBI: narrativa-commit-skill
+  - Añade sección: Contexto
+  - Añade sección: Alcance
+- **Archivos:** PBI.md, run-nuevoPBI.mjs
+
+---
+
+
 ## 🛠️ [ID: dbb9976] | 16/3/2026, 10:57:21 a.m.
 - **Autor:** lancast <angelprep92@gmail.com>
 - **Cambios Técnicos:**

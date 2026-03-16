@@ -57,11 +57,11 @@ const createSkill = () => {
 
 ## 📂 Archivos y Activos
 
-Lógica: src/agents/${skillName}Skill.js
+Lógica: agents/${skillName}Skill.js
 
 Documentación: .agent/skills/${skillName}.md
 
-Test: src/agents/test-${skillName}.js
+Test: agents/test-${skillName}.js
 
 Dependencias: \n${depListString}
 
