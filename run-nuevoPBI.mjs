@@ -1,7 +1,8 @@
-# PBI: narrativa-commit-skill
+import { run } from './agents/GestionPBISkill.js';
 
-## Descripción
-Implementar el flujo Human-in-the-loop para commits inteligentes.
+const result = await run({
+    nombre: 'narrativa-commit-skill',
+    descripcion: `Implementar el flujo Human-in-the-loop para commits inteligentes.
 
 ## Contexto
 Separar la responsabilidad del commit en dos agentes:
@@ -16,7 +17,7 @@ Separar la responsabilidad del commit en dos agentes:
    - Pausar y preguntar al usuario: ¿Quieres proceder? (s/n).
    - Solo ejecutar git commit si el usuario aprueba.
 3. Actualizar AGENTS.md para registrar NarrativaCommitSkill.
-4. Crear la skill documentation en .agent/skills/NarrativaCommit.md.
+4. Crear la skill documentation en .agent/skills/NarrativaCommit.md.`
+});
 
-## Tareas
-- [ ] Tarea inicial
+console.log(JSON.stringify(result, null, 2));
