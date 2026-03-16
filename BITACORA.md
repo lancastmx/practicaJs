@@ -1,5 +1,30 @@
 # 📓 BITÁCORA DE INGENIERÍA
 
+## 🛠️ [ID: 74dc89b] | 16/3/2026, 11:59:59 a.m.
+- **Autor:** lancast
+- **Cambios Técnicos:**
+> fix(agents): corregir RegistradorCommitSkill para preservar mensaje de commit integro
+> 
+> - Usa git log -1 --pretty=%B para capturar el mensaje completo sin alterar
+> - Formatea cada linea del mensaje como blockquote markdown (> ) en BITACORA.md
+> - Elimina la logica de vinetas forzadas y division por saltos de linea
+> - hash y autor ahora se obtienen de git directamente si no se pasan como parametro
+> - Extrae la logica del bloque a la funcion auxiliar _bloque() para reutilizacion
+- **Archivos:** agents/RegistradorCommitSkill.js, BITACORA.md
+
+---
+## 🛠️ [ID: 2953b5b] | 16/3/2026, 11:57:02 a.m.
+- **Autor:** lancast
+- **Cambios Técnicos:**
+> refactor(agents): simplificar flujo de commit eliminando patron de archivo temp
+> 
+> - AutoCommitSkill ahora solo hace git add + git diff --cached y devuelve el diff como string
+> - NarrativaCommitSkill convertida en stub deprecado; la narrativa la genera el agente del IDE
+> - Actualiza AutoCommit.md con flujo completo: diff -> narrativa -> commit -> BITACORA -> amend
+> - Marca NarrativaCommit.md como deprecada
+- **Archivos:** .agent/skills/AutoCommit.md, agents/AutoCommitSkill.js, agents/NarrativaCommitSkill.js
+
+---
 ## 🛠️ [ID: 43bd533] | 16/3/2026, 11:52:12 a.m.
 - **Autor:** lancast
 - **Cambios Técnicos:**
