@@ -1,5 +1,14 @@
 # 📓 BITÁCORA DE INGENIERÍA
 
+## 🛠️ [ID: 57cb346] | 16/3/2026, 1:39:57 p.m.
+- **Autor:** lancast
+- **Cambios Técnicos:**
+> feat(index): await ejecutaRun call
+- **Archivos:** src/index.js, src/lecciones/10-for-while.js
+
+---
+
+
 ## 🛠️ [ID: 74dc89b] | 16/3/2026, 11:59:59 a.m.
 - **Autor:** lancast
 - **Cambios Técnicos:**

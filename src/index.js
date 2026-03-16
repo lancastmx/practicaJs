@@ -1,4 +1,4 @@
-import readline from 'readline/promises'; // Versión moderna para usar await
+import readline from 'readline/promises';
 import { stdin as input, stdout as output } from 'process';
 
 const rl = readline.createInterface({ input, output });
