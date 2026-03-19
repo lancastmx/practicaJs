@@ -1,0 +1,202 @@
+diff --git a/src/index.js b/src/index.js
+index 90178ef..af89186 100644
+--- a/src/index.js
++++ b/src/index.js
+@@ -3,23 +3,30 @@ import { stdin as input, stdout as output } from 'process';
+ 
+ const rl = readline.createInterface({ input, output });
+ 
+-const lecciones = {
+-    "01": "./lecciones/01-vars.js",
+-    "07": "./lecciones/07-log.js",
+-    "08": "./lecciones/08-if-else.js",
+-    "09": "./lecciones/09-switch.js",
+-    "10": "./lecciones/10-for-while.js",
+-    "11": "./lecciones/11-funtion.js",
+-    "salir": null
+-};
++// Cambiamos el objeto {} por un Array []
++const lecciones = [
++    { id: "01", ruta: "./lecciones/01-vars.js" },
++    { id: "07", ruta: "./lecciones/07-log.js" },
++    { id: "08", ruta: "./lecciones/08-if-else.js" },
++    { id: "09", ruta: "./lecciones/09-switch.js" },
++    { id: "10", ruta: "./lecciones/10-for-while.js" },
++    { id: "11", ruta: "./lecciones/11-function.js" },
++    { id: "12", ruta: "./lecciones/12-scope.js" },
++    { id: "13", ruta: "./lecciones/13-closure.js" },
++    { id: "salir", ruta: null }
++];
+ 
+ async function iniciarLaboratorio() {
+     let continuar = true;
+ 
+     while (continuar) {
+-        console.clear(); // Limpia la consola para que se vea ordenado
++        console.clear();
+         console.log("--- 🎓 ACADEMIA JS: MENÚ PRINCIPAL ---");
+-        Object.keys(lecciones).forEach(key => console.log(`[${key}] - ${lecciones[key] || 'Cerrar programa'}`));
++
++        // Ahora recorremos el array, el orden está garantizado
++        lecciones.forEach(l => {
++            console.log(`[${l.id}] - ${l.ruta || 'Cerrar programa'}`);
++        });
+ 
+         const seleccion = await rl.question("\n¿Qué lección quieres estudiar? (o escribe 'salir'): ");
+ 
+@@ -29,21 +36,19 @@ async function iniciarLaboratorio() {
+             break;
+         }
+ 
+-        const archivo = lecciones[seleccion];
++        // Buscamos la lección dentro del array
++        const leccionEncontrada = lecciones.find(l => l.id === seleccion);
++        const archivo = leccionEncontrada ? leccionEncontrada.ruta : null;
+ 
+         if (archivo) {
++            // ... (resto de tu lógica de importación se mantiene igual)
+             let repetirLeccion = true;
+             while (repetirLeccion) {
+                 console.log(`\n📖 Iniciando: ${archivo}\n------------------`);
+-
+-                // Limpiamos el cache para que si cambias el código, se vea el cambio
+                 const timestamp = Date.now();
+                 await import(`${archivo}?update=${timestamp}`);
+-
+                 const respuesta = await rl.question("\n¿Quieres repetir esta lección? (s/n): ");
+-                if (respuesta.toLowerCase() !== 's') {
+-                    repetirLeccion = false;
+-                }
++                if (respuesta.toLowerCase() !== 's') repetirLeccion = false;
+             }
+         } else {
+             console.log("⚠️ Opción no válida. Intenta de nuevo.");
+diff --git a/src/lecciones/11-funtion.js b/src/lecciones/11-function.js
+similarity index 100%
+rename from src/lecciones/11-funtion.js
+rename to src/lecciones/11-function.js
+diff --git a/src/lecciones/12-scope.js b/src/lecciones/12-scope.js
+new file mode 100644
+index 0000000..35e5c27
+--- /dev/null
++++ b/src/lecciones/12-scope.js
+@@ -0,0 +1,22 @@
++// Ejemplos de scope global y local
++
++// Scope global
++const nombre = "Lancast";
++
++
++function mostrarNombre() {
++    console.log(nombre);
++}
++mostrarNombre();
++
++// Scope local
++function mostrarApellido() {
++    const apellido = "Lancast";
++    console.log(apellido);
++}
++mostrarApellido();
++
++// explicacion de scope
++// scope es el alcance de una variable
++// scope global es el alcance de una variable que se puede usar en cualquier parte del codigo
++// scope local es el alcance de una variable que solo se puede usar en el bloque de codigo donde se define
+\ No newline at end of file
+diff --git a/src/lecciones/13-closure.js b/src/lecciones/13-closure.js
+new file mode 100644
+index 0000000..f7f0934
+--- /dev/null
++++ b/src/lecciones/13-closure.js
+@@ -0,0 +1,63 @@
++// Ejemplo de closure
++function crearContador() {
++    let contador = 0;
++    return function () {
++        contador++;
++        return contador;
++    };
++}
++const contador = crearContador();
++console.log(contador()); // 1
++console.log(contador()); // 2
++console.log(contador()); // 3
++
++// Ejemplo de closure con variables externas
++
++function crearCajaDeAhorro(saldoInicial) {
++    let saldo = saldoInicial;
++    return {
++        depositar(monto) {
++            saldo += monto;
++            return `Depósito de $${monto}. Saldo actual: $${saldo}`;
++        },
++        retirar(monto) {
++            if (monto > saldo) {
++                return "Fondos insuficientes";
++            }
++            saldo -= monto;
++            return `Retiro de $${monto}. Saldo actual: $${saldo}`;
++        },
++        consultarSaldo() {
++            return `Saldo actual: $${saldo}`;
++        }
++    }
++
++}
++
++const miCajaDeAhorro = crearCajaDeAhorro(1000);
++console.log(miCajaDeAhorro.consultarSaldo());
++console.log(miCajaDeAhorro.depositar(500));
++console.log(miCajaDeAhorro.retirar(200));
++console.log(miCajaDeAhorro.retirar(2000));
++
++function crearGastoPersonal(saldoLibre) {
++    let saldo = saldoLibre; // Este es nuestro "estado" privado
++
++    return {
++        // Dividimos el saldo actual entre los 15 días
++        obtenerPresupuestoDiario() {
++            let diario = saldo / 15;
++            return `Tienes $${diario.toFixed(2)} para gastar por día.`;
++        },
++
++        // Por si quieres ir restando lo que ya gastaste
++        registrarGasto(monto) {
++            saldo -= monto;
++            return `Gastaste $${monto}. Saldo restante: $${saldo.toFixed(2)}`;
++        }
++    };
++}
++
++// Cómo usarlo:
++const misFinanzas = crearGastoPersonal(3000);
++console.log(misFinanzas.obtenerPresupuestoDiario()); // "Tienes $200.00 para gastar por día."
+\ No newline at end of file
+diff --git a/tmp_diff.json b/tmp_diff.json
+new file mode 100644
+index 0000000..2446e67
+--- /dev/null
++++ b/tmp_diff.json
+@@ -0,0 +1,4 @@
++{
++  "success": false,
++  "error": "Command failed: git add ."
++}
+diff --git a/tmp_wrapper.js b/tmp_wrapper.js
+new file mode 100644
+index 0000000..cf17a11
+--- /dev/null
++++ b/tmp_wrapper.js
+@@ -0,0 +1,10 @@
++import { run } from './agents/AutoCommitSkill.js';
++
++(async () => {
++    try {
++        const result = await run();
++        console.log(JSON.stringify(result, null, 2));
++    } catch (error) {
++        console.error(JSON.stringify({ success: false, error: error.message }, null, 2));
++    }
++})();

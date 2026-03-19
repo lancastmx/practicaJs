@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const agentsPath = path.join(__dirname, '../../AGENTS.md');
+const agentsPath = path.join(__dirname, '../AGENTS.md');
 
 const skillName = process.argv[2];
 const description = process.argv[3] || 'Sin descripción';
@@ -13,7 +13,7 @@ import { execSync } from 'child_process';
 const createSkill = () => {
     const paths = {
         js: path.join(__dirname, `${skillName}Skill.js`),
-        md: path.join(__dirname, `../../.agent/skills/${skillName}.md`),
+        md: path.join(__dirname, `../.agent/skills/${skillName}.md`),
         test: path.join(__dirname, `test-${skillName}.js`)
     };
 
@@ -74,7 +74,7 @@ El Orquestador debe enviar:
 \`\`\`json
 {
   "action": "execute",
-  "entryPoint": "src/agents/${skillName}Skill.js",
+  "entryPoint": "agents/${skillName}Skill.js",
   "function": "run",
   "params": {}
 }

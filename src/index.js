@@ -3,23 +3,30 @@ import { stdin as input, stdout as output } from 'process';
 
 const rl = readline.createInterface({ input, output });
 
-const lecciones = {
-    "01": "./lecciones/01-vars.js",
-    "07": "./lecciones/07-log.js",
-    "08": "./lecciones/08-if-else.js",
-    "09": "./lecciones/09-switch.js",
-    "10": "./lecciones/10-for-while.js",
-    "11": "./lecciones/11-funtion.js",
-    "salir": null
-};
+// Cambiamos el objeto {} por un Array []
+const lecciones = [
+    { id: "01", ruta: "./lecciones/01-vars.js" },
+    { id: "07", ruta: "./lecciones/07-log.js" },
+    { id: "08", ruta: "./lecciones/08-if-else.js" },
+    { id: "09", ruta: "./lecciones/09-switch.js" },
+    { id: "10", ruta: "./lecciones/10-for-while.js" },
+    { id: "11", ruta: "./lecciones/11-function.js" },
+    { id: "12", ruta: "./lecciones/12-scope.js" },
+    { id: "13", ruta: "./lecciones/13-closure.js" },
+    { id: "salir", ruta: null }
+];
 
 async function iniciarLaboratorio() {
     let continuar = true;
 
     while (continuar) {
-        console.clear(); // Limpia la consola para que se vea ordenado
+        console.clear();
         console.log("--- 🎓 ACADEMIA JS: MENÚ PRINCIPAL ---");
-        Object.keys(lecciones).forEach(key => console.log(`[${key}] - ${lecciones[key] || 'Cerrar programa'}`));
+
+        // Ahora recorremos el array, el orden está garantizado
+        lecciones.forEach(l => {
+            console.log(`[${l.id}] - ${l.ruta || 'Cerrar programa'}`);
+        });
 
         const seleccion = await rl.question("\n¿Qué lección quieres estudiar? (o escribe 'salir'): ");
 
@@ -29,21 +36,19 @@ async function iniciarLaboratorio() {
             break;
         }
 
-        const archivo = lecciones[seleccion];
+        // Buscamos la lección dentro del array
+        const leccionEncontrada = lecciones.find(l => l.id === seleccion);
+        const archivo = leccionEncontrada ? leccionEncontrada.ruta : null;
 
         if (archivo) {
+            // ... (resto de tu lógica de importación se mantiene igual)
             let repetirLeccion = true;
             while (repetirLeccion) {
                 console.log(`\n📖 Iniciando: ${archivo}\n------------------`);
-
-                // Limpiamos el cache para que si cambias el código, se vea el cambio
                 const timestamp = Date.now();
                 await import(`${archivo}?update=${timestamp}`);
-
                 const respuesta = await rl.question("\n¿Quieres repetir esta lección? (s/n): ");
-                if (respuesta.toLowerCase() !== 's') {
-                    repetirLeccion = false;
-                }
+                if (respuesta.toLowerCase() !== 's') repetirLeccion = false;
             }
         } else {
             console.log("⚠️ Opción no válida. Intenta de nuevo.");

@@ -11,7 +11,7 @@ async function getDynamicExclusions() {
     let excludes = ['TODOS.md'];
     try {
         const __filename = fileURLToPath(import.meta.url);
-        const mdPath = path.join(path.dirname(__filename), '../../.agent/skills/BuscadorTodos.md');
+        const mdPath = path.join(path.dirname(__filename), '../.agent/skills/BuscadorTodos.md');
         if (fs.existsSync(mdPath)) {
             const mdContent = await fs.promises.readFile(mdPath, 'utf8');
             const filesSection = mdContent.match(/## 📂 Archivos y Activos([^#]+)/);

@@ -1,8 +1,8 @@
 - **SI** el usuario pide "crear una skill" o "nueva herramienta":
   -> DELEGAR A: `SkillFactory.js`
-  -> ACCIÓN: Ejecutar en terminal `node src/agents/SkillFactory.js [nombre] "[descripcion]"`
+  -> ACCIÓN: Ejecutar en terminal `node agents/SkillFactory.js [nombre] "[descripcion]"`
 
-> **🚫 REGLA ESTRICTA DEL ORQUESTADOR:** QUEDA TERMINANTEMENTE PROHIBIDO ejecutar archivos que comiencen con el prefijo `test-` (e.g. `test-AutoCommit.js`) para llevar a cabo solicitudes de producción de usuario. El Orquestador DEBE SIEMPRE usar el archivo lógico real definido en el `entryPoint` (e.g. `src/agents/AutoCommitSkill.js`).
+> **🚫 REGLA ESTRICTA DEL ORQUESTADOR:** QUEDA TERMINANTEMENTE PROHIBIDO ejecutar archivos que comiencen con el prefijo `test-` (e.g. `test-AutoCommit.js`) para llevar a cabo solicitudes de producción de usuario. El Orquestador DEBE SIEMPRE usar el archivo lógico real definido en el `entryPoint` (e.g. `agents/AutoCommitSkill.js`).
 - **SI** el usuario pide "LectorLogs":
   -> DELEGAR A: `LectorLogsSkill.js`
   -> REGLAS DE USO: [.agent/skills/LectorLogs.md](.agent/skills/LectorLogs.md)

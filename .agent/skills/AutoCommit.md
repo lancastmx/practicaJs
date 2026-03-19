@@ -7,8 +7,6 @@ Lógica: `agents/AutoCommitSkill.js`
 
 Documentación: `.agent/skills/AutoCommit.md`
 
-Test: `agents/test-AutoCommit.js`
-
 Dependencias: Ninguna. El agente del IDE asume el rol de generar el mensaje.
 
 ## 🧠 Cuándo aplicar (Trigger)

@@ -1,5 +1,18 @@
 # 📓 BITÁCORA DE INGENIERÍA
 
+## 🛠️ [ID: fa46c83] | 19/3/2026, 1:25:34 p.m.
+- **Autor:** lancast
+- **Cambios Técnicos:**
+> fix(agents): corregir concatenacion de rutas y normalizar prefijo de agentes
+> 
+> - Corrige rutas relativas de ../../ a ../ en SkillFactory.js y BuscadorTodosSkill.js.
+> - Elimina el prefijo inexistente src/ en AGENTS.md y en las reglas generadas por SkillFactory.js.
+> - Asegura que los entryPoints apunten correctamente a la carpeta agents/.
+- **Archivos:** AGENTS.md, agents/SkillFactory.js, agents/BuscadorTodosSkill.js
+
+---
+
+
 ## 🛠️ [ID: e78c379861e885581b814e49d59b4117] | 17/3/2026, 9:39:43 a.m.
 - **Autor:** lancast
 - **Cambios Técnicos:**
